@@ -404,6 +404,7 @@ def _ingest_linkedin(raw_items, keyword, time_period, custom_dates):
             "Profile URL": profile_url,
             "Post Link": post_url,
             "Post Text (Preview)": snippet,
+            "Post Text Raw": raw_text,
             "Reactions": likes,
             "Comments": comments,
             "Reposts": reposts,
@@ -852,6 +853,44 @@ def _run_scrape(platform, keyword, time_period, custom_dates, token, max_posts, 
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LINKEDIN-STYLE BLUE HIGHLIGHT FOR POLARIS TAGS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+import re as _re
+
+# All Polaris mention patterns — matches the exact phrases LinkedIn would linkify
+_POLARIS_TERMS = [
+    "Polaris School of Technology",
+    "Polaris School of Techology",   # common typo seen in the wild
+    "polariscampus",
+    "@polaris_code",
+    "polaris_code",
+    "#PolarisSchoolofTechnology",
+    "#Polaris",
+]
+_POLARIS_RE = _re.compile(
+    "(" + "|".join(_re.escape(t) for t in _POLARIS_TERMS) + ")",
+    _re.IGNORECASE,
+)
+
+_LI_BLUE_SPAN = (
+    '<span style="'
+    "color:#0A66C2;"
+    "font-weight:600;"
+    "background:rgba(10,102,194,0.08);"
+    "border-radius:3px;"
+    "padding:0 2px;"
+    '">{}</span>'
+)
+
+
+def _highlight_polaris(text: str) -> str:
+    """Wrap every Polaris mention in LinkedIn-blue styled span. Input is already HTML-escaped."""
+    def _replace(m):
+        return _LI_BLUE_SPAN.format(m.group(0))
+    return _POLARIS_RE.sub(_replace, text)
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # RENDER RESULTS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def _render_results(platform):
@@ -940,7 +979,12 @@ def _render_results(platform):
 
             author = _esc(p.get("Account Name", ""))
             headline_text = _esc(p.get("Headline / Bio", ""))
-            snippet = _esc(p.get("Post Text (Preview)", ""))
+            raw_snippet = _esc(p.get("Post Text (Preview)", ""))
+            # For LinkedIn: wrap Polaris mentions in LinkedIn-blue highlight spans
+            if platform == "linkedin":
+                snippet = _highlight_polaris(raw_snippet)
+            else:
+                snippet = raw_snippet
             posted = _esc(p.get("DateTime (IST)", ""))
             post_link = _esc(p.get("Post Link", ""))
             scraped_ts = _esc(p.get("Scraped At", ""))
