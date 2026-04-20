@@ -557,50 +557,66 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # EXCEL EXPORT — BRANDED & FORMATTED
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+def _normalise_for_export(posts):
+    """Ensure every post dict has all export columns — fills missing fields with safe defaults."""
+    DEFAULTS = {
+        "Date": "", "Time": "", "DateTime (IST)": "", "Account Name": "",
+        "Headline / Bio": "", "Profile URL": "", "Post Link": "",
+        "Post Text (Preview)": "", "Reactions": 0, "Comments": 0, "Reposts": 0,
+        "Views": 0, "Views Source": "N/A", "Est. Impressions": 0,
+        "Tags Polaris": "No", "Platform": "", "Scraped At": "",
+    }
+    normalised = []
+    for p in posts:
+        row = dict(DEFAULTS)
+        row.update({k: v for k, v in p.items() if k in DEFAULTS})
+        # For LinkedIn: derive Est. Impressions if missing; Views stays 0
+        if row["Platform"] == "LinkedIn" and row["Est. Impressions"] == 0:
+            row["Est. Impressions"] = int(row["Reactions"]) * 80
+            row["Views Source"] = "N/A (LinkedIn)"
+        # For X: Views already set; copy to Est. Impressions col for unified view
+        if row["Platform"] == "X (Twitter)" and row["Views"] > 0:
+            row["Est. Impressions"] = row["Views"]
+        normalised.append(row)
+    return normalised
+
+
 def _build_excel(posts_linkedin, posts_x, keyword):
     buf = io.BytesIO()
 
     EXPORT_COLS = [
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
-        "Reactions", "Comments", "Reposts", "Est. Impressions",
-        "Views", "Views Source",
+        "Reactions", "Comments", "Reposts",
+        "Views", "Views Source", "Est. Impressions",
         "Tags Polaris", "Platform", "Scraped At"
     ]
 
-    # Combine all posts
-    all_posts = posts_linkedin + posts_x
-    all_posts.sort(key=lambda p: p.get("PostedDT") or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
-    polaris_posts = [p for p in all_posts if p.get("Tags Polaris") == "Yes"]
+    # Normalise both sets so no column is missing
+    li_norm = _normalise_for_export(posts_linkedin)
+    x_norm  = _normalise_for_export(posts_x)
+
+    # Sort combined posts by original PostedDT (from pre-normalisation dicts)
+    raw_all = posts_linkedin + posts_x
+    raw_all_sorted = sorted(
+        raw_all,
+        key=lambda p: p.get("PostedDT") or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+    # Normalise in sorted order
+    all_posts_sorted = _normalise_for_export(raw_all_sorted)
+    polaris_posts = [p for p in all_posts_sorted if p.get("Tags Polaris") == "Yes"]
+
+    def to_df(data):
+        if data:
+            return pd.DataFrame(data)[EXPORT_COLS]
+        return pd.DataFrame(columns=EXPORT_COLS)
 
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
-        # ── Sheet 1: All Posts ──
-        if all_posts:
-            df_all = pd.DataFrame(all_posts)[EXPORT_COLS]
-        else:
-            df_all = pd.DataFrame(columns=EXPORT_COLS)
-        df_all.to_excel(writer, sheet_name="All Posts", index=False)
-
-        # ── Sheet 2: Tags Polaris Only ──
-        if polaris_posts:
-            df_pol = pd.DataFrame(polaris_posts)[EXPORT_COLS]
-        else:
-            df_pol = pd.DataFrame(columns=EXPORT_COLS)
-        df_pol.to_excel(writer, sheet_name="Tags Polaris", index=False)
-
-        # ── Sheet 3: LinkedIn Only ──
-        if posts_linkedin:
-            df_li = pd.DataFrame(posts_linkedin)[EXPORT_COLS]
-        else:
-            df_li = pd.DataFrame(columns=EXPORT_COLS)
-        df_li.to_excel(writer, sheet_name="LinkedIn", index=False)
-
-        # ── Sheet 4: X Only ──
-        if posts_x:
-            df_x = pd.DataFrame(posts_x)[EXPORT_COLS]
-        else:
-            df_x = pd.DataFrame(columns=EXPORT_COLS)
-        df_x.to_excel(writer, sheet_name="X (Twitter)", index=False)
+        to_df(all_posts_sorted).to_excel(writer, sheet_name="All Posts", index=False)
+        to_df(polaris_posts).to_excel(writer, sheet_name="Tags Polaris", index=False)
+        to_df(li_norm).to_excel(writer, sheet_name="LinkedIn", index=False)
+        to_df(x_norm).to_excel(writer, sheet_name="X (Twitter)", index=False)
 
         wb = writer.book
 
@@ -660,7 +676,7 @@ def _build_excel(posts_linkedin, posts_x, keyword):
                     else:
                         cell.fill = ALT_FILL if is_alt else BASE_FILL
                         cell.font = Font(color="94A3B8", size=9, name="Calibri")
-                        if col_name in ("Reactions", "Comments", "Reposts", "Est. Impressions"):
+                        if col_name in ("Reactions", "Comments", "Reposts", "Views", "Est. Impressions"):
                             cell.alignment = Alignment(horizontal="right")
                         else:
                             cell.alignment = Alignment(horizontal="left", wrap_text=False, vertical="center")
@@ -895,7 +911,10 @@ def _render_results(platform):
 
     # Table toggle
     if st.toggle(f"📄 Show raw data table", value=False, key=f"raw_{platform}"):
-        DISPLAY_COLS = ["Date", "Account Name", "Post Link", "Reactions", "Comments", "Reposts", "Est. Impressions", "Tags Polaris"]
+        if platform == "x":
+            DISPLAY_COLS = ["Date", "Account Name", "Post Link", "Reactions", "Comments", "Reposts", "Views", "Views Source", "Tags Polaris"]
+        else:
+            DISPLAY_COLS = ["Date", "Account Name", "Post Link", "Reactions", "Comments", "Reposts", "Est. Impressions", "Tags Polaris"]
         df_show = pd.DataFrame(posts)[[c for c in DISPLAY_COLS if c in pd.DataFrame(posts).columns]]
         st.dataframe(
             df_show, use_container_width=True, hide_index=True,
@@ -994,16 +1013,17 @@ def _render_results(platform):
     # Downloads
     st.markdown("---")
     dl1, dl2, _ = st.columns([1, 1, 3])
+
+    # Normalise posts so all columns exist before exporting
+    posts_norm = _normalise_for_export(posts)
     EXPORT_COLS_DISPLAY = [
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
-        "Reactions", "Comments", "Reposts", "Est. Impressions",
-        "Views", "Views Source",
+        "Reactions", "Comments", "Reposts",
+        "Views", "Views Source", "Est. Impressions",
         "Tags Polaris", "Platform", "Scraped At"
     ]
-    df_export = pd.DataFrame(posts)
-    df_export_cols = [c for c in EXPORT_COLS_DISPLAY if c in df_export.columns]
-    df_export = df_export[df_export_cols]
+    df_export = pd.DataFrame(posts_norm)[EXPORT_COLS_DISPLAY]
 
     dl1.download_button(
         "📥 Download CSV",
@@ -1016,8 +1036,6 @@ def _render_results(platform):
 
     # Excel with formatting
     try:
-        posts_li = st.session_state.get("posts_linkedin", []) if platform == "linkedin" else []
-        posts_xp = st.session_state.get("posts_x", []) if platform == "x" else []
         if platform == "linkedin":
             xl_data = _build_excel(posts, [], kw)
         else:
