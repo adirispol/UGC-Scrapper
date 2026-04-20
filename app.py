@@ -492,11 +492,14 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
         tweet_id = str(item.get("id", item.get("tweetId", "")))
         impressions_est = likes * 35
 
-        tags_polaris = "Yes" if (
-            "polaris" in text.lower() or
-            "polariscampus" in text.lower() or
-            kw_lower in text.lower()
-        ) else "No"
+        tags_polaris = "Yes" if any([
+            "polaris school of technology" in text.lower(),
+            "polariscampus" in text.lower(),
+            "@polaris_code" in text.lower(),
+            "polaris_code" in text.lower(),
+            "#polaris" in text.lower(),
+            kw_lower in text.lower(),
+        ]) else "No"
 
         posts.append({
             "Date": posted_date,
@@ -676,16 +679,34 @@ def _run_scrape(platform, keyword, time_period, custom_dates, token, max_posts, 
                 }
             else:
                 run_url = f"{APIFY_BASE}/acts/{ACTOR_X}/runs?token={token}"
-                final_kw = keyword.strip()
+
+                # Always search all 3 Polaris X signals simultaneously
+                date_suffix = ""
                 if time_period == "custom" and custom_dates and len(custom_dates) > 0:
                     sd = custom_dates[0]
                     ed = custom_dates[1] if len(custom_dates) > 1 else custom_dates[0]
                     sd_str = sd.strftime("%Y-%m-%d") if isinstance(sd, datetime) else sd.isoformat()
                     ed_obj = (ed + timedelta(days=1))
                     ed_str = ed_obj.strftime("%Y-%m-%d") if isinstance(ed_obj, datetime) else ed_obj.isoformat()
-                    final_kw += f" since:{sd_str} until:{ed_str}"
+                    date_suffix = f" since:{sd_str} until:{ed_str}"
+
+                base_kw = keyword.strip()
+                search_terms = [
+                    base_kw + date_suffix,
+                    "Polaris School of Technology" + date_suffix,
+                    "@polaris_code" + date_suffix,
+                ]
+                # Deduplicate in case user typed one of the fixed terms
+                seen_terms = set()
+                unique_terms = []
+                for t in search_terms:
+                    key = t.strip().lower()
+                    if key not in seen_terms:
+                        seen_terms.add(key)
+                        unique_terms.append(t)
+
                 payload = {
-                    "searchTerms": [final_kw],
+                    "searchTerms": unique_terms,
                     "tweetsToScrape": max_posts,
                     "maxItems": max_posts,
                 }
@@ -1113,10 +1134,14 @@ with tab_li:
 
 # ━━ TAB 2: X ━━
 with tab_x:
+    st.info(
+        "🔍 **Auto-tracked on every scrape:** `Polaris School of Technology` · `@polaris_code`  \n"
+        "Add any extra keyword below (or leave as default). All 3 signals run together in one API call."
+    )
     col_kw, col_tf = st.columns([2.5, 1])
     with col_kw:
         keyword_x = st.text_input(
-            "Keyword / #hashtag / @mention",
+            "Additional Keyword / #hashtag / @mention",
             value="Polaris School of Technology",
             key="kw_x",
         )
@@ -1164,7 +1189,12 @@ with tab_x:
 with tab_help:
     st.markdown("""
 ### 🎯 What This Tool Does
-Tracks every LinkedIn and X (Twitter) post that mentions Polaris School of Technology. 
+Tracks every LinkedIn and X (Twitter) post that mentions Polaris School of Technology.
+On X, **three signals are tracked automatically on every scrape:**
+- Your custom keyword (default: `Polaris School of Technology`)
+- `Polaris School of Technology` — always on
+- `@polaris_code` — always on
+
 Lets you filter by date range, see who posted, and download a clean Excel with all columns your team needs.
 
 ---
