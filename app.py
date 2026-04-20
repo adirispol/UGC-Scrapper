@@ -490,7 +490,23 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
             posted_time = ""
 
         tweet_id = str(item.get("id", item.get("tweetId", "")))
-        impressions_est = likes * 35
+        # Real views from xquik/Twitter API — covers all known field names
+        views_raw = (
+            item.get("viewCount")
+            or item.get("views")
+            or item.get("view_count")
+            or item.get("impressionCount")
+            or item.get("impressions")
+            or item.get("views_count")
+        )
+        if isinstance(views_raw, dict):
+            views_raw = views_raw.get("count") or views_raw.get("value") or 0
+        try:
+            real_views = int(views_raw or 0)
+        except (ValueError, TypeError):
+            real_views = 0
+        views_display = real_views if real_views > 0 else likes * 35
+        views_source = "Real" if real_views > 0 else "Est."
 
         tags_polaris = "Yes" if any([
             "polaris school of technology" in text.lower(),
@@ -513,7 +529,8 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
             "Reactions": likes,
             "Comments": replies,
             "Reposts": retweets,
-            "Est. Impressions": impressions_est,
+            "Views": views_display,
+            "Views Source": views_source,
             "Tags Polaris": tags_polaris,
             "Platform": "X (Twitter)",
             "Scraped At": datetime.now(IST).strftime("%d %b %Y %H:%M IST"),
@@ -547,6 +564,7 @@ def _build_excel(posts_linkedin, posts_x, keyword):
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
         "Reactions", "Comments", "Reposts", "Est. Impressions",
+        "Views", "Views Source",
         "Tags Polaris", "Platform", "Scraped At"
     ]
 
@@ -604,8 +622,8 @@ def _build_excel(posts_linkedin, posts_x, keyword):
             "Profile URL": 40, "Post Link": 40,
             "Post Text (Preview)": 55,
             "Reactions": 12, "Comments": 12, "Reposts": 12,
-            "Est. Impressions": 18, "Tags Polaris": 14,
-            "Platform": 14, "Scraped At": 22
+            "Est. Impressions": 18, "Views": 16, "Views Source": 12,
+            "Tags Polaris": 14, "Platform": 14, "Scraped At": 22
         }
 
         for sheet_name in wb.sheetnames:
@@ -836,6 +854,8 @@ def _render_results(platform):
     cnt_today = sum(1 for p in posts if p.get("PostedDT") and p["PostedDT"] >= midnight_ist)
     total_reactions = sum(p.get("Reactions", 0) for p in posts)
     total_impressions = sum(p.get("Est. Impressions", 0) for p in posts)
+    total_views = sum(p.get("Views", 0) for p in posts)
+    has_real_views = any(p.get("Views Source") == "Real" for p in posts)
     polaris_count = sum(1 for p in posts if p.get("Tags Polaris") == "Yes")
 
     label = "LinkedIn" if platform == "linkedin" else "X (Twitter)"
@@ -862,9 +882,15 @@ def _render_results(platform):
     m2.metric("📅 Today", cnt_today)
     m3.metric("🎯 Tags Polaris", polaris_count)
     m4.metric("❤️ Total Reactions", f"{total_reactions:,}")
-    m5.metric("👀 Est. Impressions", f"{total_impressions:,}")
-
-    st.caption("Est. Impressions = Reactions × 80 (LinkedIn) or × 35 (X). Sample only, not full universe.")
+    if platform == "x" and has_real_views:
+        m5.metric("👁 Total Views (Real)", f"{total_views:,}")
+        st.caption("👁 View counts are **real data** pulled directly from X via Apify. No estimates.")
+    elif platform == "x":
+        m5.metric("👁 Views (Est.)", f"{total_views:,}")
+        st.caption("Views = Reactions × 35 (estimate — X did not return view data for these tweets).")
+    else:
+        m5.metric("👀 Est. Impressions", f"{total_impressions:,}")
+        st.caption("Est. Impressions = Reactions × 80. Sample only, not full universe.")
     st.markdown("")
 
     # Table toggle
@@ -934,6 +960,20 @@ def _render_results(platform):
             btn_class = "card-link-x" if platform == "x" else "card-link-linkedin"
             pf_name = "X" if platform == "x" else "LinkedIn"
 
+            # Views badge — show real count if available, else reactions
+            p_views = p.get("Views", 0)
+            p_views_src = p.get("Views Source", "Est.")
+            if platform == "x" and p_views > 0:
+                views_label = f"👁 {int(p_views):,} Views" + (" ✓" if p_views_src == "Real" else " (est.)")
+                views_badge_html = (
+                    f'<div style="display:inline-flex;align-items:center;gap:5px;'
+                    f'background:rgba(56,189,248,.08);color:#7dd3fc;'
+                    f'padding:4px 12px;border-radius:999px;font-weight:600;font-size:.85rem;'
+                    f'border:1px solid rgba(56,189,248,.15);margin-bottom:6px;">{views_label}</div>'
+                )
+            else:
+                views_badge_html = ""
+
             with cols[j]:
                 st.markdown(
                     f'<div class="glass">'
@@ -943,6 +983,7 @@ def _render_results(platform):
                     f'</div>'
                     f'{snip}{date_badge}'
                     f'<div class="badge-likes">❤️ {int(p.get("Reactions", 0)):,} Reactions</div>'
+                    f'{views_badge_html}'
                     f'<a href="{post_link}" target="_blank" rel="noopener noreferrer" '
                     f'class="{btn_class}">🔗&nbsp; View on {pf_name}</a>'
                     f'<div class="card-ts">🕒 Scraped {scraped_ts}</div>'
@@ -957,6 +998,7 @@ def _render_results(platform):
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
         "Reactions", "Comments", "Reposts", "Est. Impressions",
+        "Views", "Views Source",
         "Tags Polaris", "Platform", "Scraped At"
     ]
     df_export = pd.DataFrame(posts)
