@@ -40,464 +40,173 @@ st.set_page_config(
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ── BASE ── */
 html, body, .stApp {
-    background: #070A12 !important;
-    font-family: 'Outfit', system-ui, sans-serif !important;
-    color: #CBD5E1;
+    background: #05080f !important;
+    font-family: 'Sora', system-ui, sans-serif !important;
+    color: #e2e8f0;
 }
-::-webkit-scrollbar { width: 3px; background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(99,102,241,.35); border-radius: 99px; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(139,92,246,.4); border-radius: 99px; }
 
-/* ── ANIMATED BACKGROUND MESH ── */
-.stApp::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 900px 600px at 15% 10%, rgba(99,102,241,.07) 0%, transparent 60%),
-        radial-gradient(ellipse 700px 500px at 85% 80%, rgba(236,72,153,.05) 0%, transparent 55%),
-        radial-gradient(ellipse 500px 400px at 50% 50%, rgba(6,182,212,.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* ── HERO ── */
 .hero {
-    position: relative;
     text-align: center;
-    padding: 3.5rem 2rem 2.5rem;
-    margin-bottom: 0;
-    overflow: hidden;
+    padding: 2.8rem 1rem 1.8rem;
+    margin-bottom: 0.5rem;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,92,246,.18) 0%, transparent 70%);
+    border-bottom: 1px solid rgba(139,92,246,.12);
+    position: relative;
 }
-.hero-noise {
+.hero::before {
+    content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-    opacity: .4;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238B5CF6' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
-}
-.hero-rule {
-    width: 48px; height: 3px;
-    background: linear-gradient(90deg, #6366f1, #ec4899);
-    border-radius: 99px;
-    margin: 0 auto 1.4rem;
 }
 .hero-eyebrow {
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .22em;
-    color: #6366f1;
-    text-transform: uppercase;
-    margin-bottom: .9rem;
-    font-family: 'DM Mono', monospace;
+    font-size: .78rem; font-weight: 600; letter-spacing: .18em;
+    color: #a78bfa; text-transform: uppercase; margin-bottom: .7rem;
+    font-family: 'JetBrains Mono', monospace;
 }
 .hero-title {
-    font-size: 3.4rem;
-    font-weight: 900;
-    letter-spacing: -.05em;
-    line-height: 1.05;
-    margin-bottom: .5rem;
-    color: #F8FAFC;
+    font-size: 2.8rem; font-weight: 800; letter-spacing: -.04em;
+    background: linear-gradient(135deg, #c4b5fd 10%, #818cf8 45%, #38bdf8 85%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: .4rem; line-height: 1.15;
 }
-.hero-title span {
-    background: linear-gradient(125deg, #818cf8 0%, #a78bfa 35%, #ec4899 70%, #f97316 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.hero-sub {
-    color: #475569;
-    font-size: .9rem;
-    max-width: 520px;
-    margin: 0 auto 0;
-    line-height: 1.6;
-    font-weight: 400;
-}
-.hero-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,102,241,.2) 30%, rgba(236,72,153,.15) 70%, transparent);
-    margin-top: 2.5rem;
-}
+.hero-sub { color: #64748b; font-size: .95rem; max-width: 580px; margin: 0 auto; }
 
-/* ── SIDEBAR ── */
-section[data-testid="stSidebar"] {
-    background: #070A12 !important;
-    border-right: 1px solid rgba(99,102,241,.1) !important;
-}
-section[data-testid="stSidebar"] > div { padding-top: 1.5rem !important; }
-.sidebar-logo {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 0 1.2rem 0;
-    border-bottom: 1px solid rgba(99,102,241,.1);
-    margin-bottom: 1.4rem;
-}
-.sidebar-logo-dot {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: linear-gradient(135deg, #6366f1, #ec4899);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
-}
-.sidebar-logo-text {
-    font-size: .85rem; font-weight: 700; color: #E2E8F0; line-height: 1.2;
-}
-.sidebar-logo-sub { font-size: .7rem; color: #475569; font-weight: 400; }
-
-.sidebar-section {
-    margin-bottom: 1.6rem;
-}
-.sidebar-label {
-    font-size: .65rem; font-weight: 700; letter-spacing: .15em;
-    text-transform: uppercase; color: #334155;
-    font-family: 'DM Mono', monospace;
-    margin-bottom: .6rem; display: block;
-}
-.cost-chip {
-    display: flex; justify-content: space-between;
-    background: rgba(99,102,241,.06); border: 1px solid rgba(99,102,241,.12);
-    border-radius: 8px; padding: 8px 14px; margin-bottom: 8px;
-}
-.cost-chip-label { font-size: .78rem; color: #64748b; }
-.cost-chip-val { font-size: .78rem; font-weight: 600; color: #818cf8; font-family: 'DM Mono', monospace; }
-
-/* ── FORM ELEMENTS ── */
-div[data-baseweb="input"] > div {
-    background: rgba(15,20,40,.9) !important;
-    border: 1px solid rgba(99,102,241,.18) !important;
-    border-radius: 10px !important;
-    transition: border-color .2s ease;
-}
-div[data-baseweb="input"] > div:focus-within {
-    border-color: rgba(99,102,241,.5) !important;
-    box-shadow: 0 0 0 3px rgba(99,102,241,.1) !important;
-}
-div[data-baseweb="select"] > div {
-    background: rgba(15,20,40,.9) !important;
-    border: 1px solid rgba(99,102,241,.18) !important;
-    border-radius: 10px !important;
-}
-input, textarea {
-    color: #E2E8F0 !important;
-    font-family: 'Outfit', sans-serif !important;
-}
-
-/* ── TABS ── */
-.stTabs [data-baseweb="tab-list"] {
-    background: rgba(15,20,40,.6) !important;
-    border-radius: 12px !important;
-    padding: 4px !important;
-    gap: 2px !important;
-    border: 1px solid rgba(99,102,241,.1) !important;
-    margin-bottom: 1.5rem;
-}
-.stTabs [data-baseweb="tab"] {
-    background: transparent !important;
-    border-radius: 9px !important;
-    font-size: .9rem !important;
-    font-weight: 600 !important;
-    padding: 9px 22px !important;
-    color: #475569 !important;
-    transition: all .2s ease !important;
-    font-family: 'Outfit', sans-serif !important;
-    border: none !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: rgba(99,102,241,.15) !important;
-    color: #a5b4fc !important;
-    box-shadow: inset 0 0 0 1px rgba(99,102,241,.25) !important;
-}
-.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
-.stTabs [data-baseweb="tab-border"] { display: none !important; }
-
-/* ── SCRAPE BUTTON ── */
-div.stButton > button {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%) !important;
-    color: #fff !important;
-    font-weight: 700 !important;
-    font-size: .95rem !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: .85rem 1.5rem !important;
-    box-shadow: 0 4px 24px rgba(79,70,229,.3), 0 1px 0 rgba(255,255,255,.08) inset !important;
-    transition: all .3s cubic-bezier(.34,1.56,.64,1) !important;
-    font-family: 'Outfit', sans-serif !important;
-    letter-spacing: .01em !important;
-    text-transform: none !important;
-    width: 100% !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-div.stButton > button:hover {
-    transform: translateY(-3px) scale(1.005) !important;
-    box-shadow: 0 12px 40px rgba(79,70,229,.45), 0 1px 0 rgba(255,255,255,.1) inset !important;
-}
-div.stButton > button:active { transform: translateY(0) scale(.995) !important; }
-
-/* ── DOWNLOAD BUTTON ── */
-div.stDownloadButton > button {
-    background: rgba(15,20,40,.7) !important;
-    border: 1px solid rgba(99,102,241,.2) !important;
-    color: #a5b4fc !important;
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    font-size: .85rem !important;
-    padding: .65rem 1.2rem !important;
-    transition: all .2s ease !important;
-    font-family: 'Outfit', sans-serif !important;
-}
-div.stDownloadButton > button:hover {
-    border-color: rgba(99,102,241,.45) !important;
-    background: rgba(99,102,241,.12) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* ── METRIC CARD ── */
-div[data-testid="metric-container"] {
-    background: rgba(15,20,40,.7) !important;
-    border: 1px solid rgba(99,102,241,.12) !important;
-    border-radius: 12px !important;
-    padding: 1rem 1.2rem !important;
-}
-div[data-testid="metric-container"] label {
-    font-size: .7rem !important;
-    font-weight: 600 !important;
-    letter-spacing: .12em !important;
-    text-transform: uppercase !important;
-    color: #475569 !important;
-    font-family: 'DM Mono', monospace !important;
-}
-div[data-testid="metric-container"] [data-testid="stMetricValue"] {
-    font-size: 1.8rem !important;
-    font-weight: 800 !important;
-    color: #F8FAFC !important;
-    letter-spacing: -.03em !important;
-    font-family: 'Outfit', sans-serif !important;
-}
-
-/* ── SLIDER ── */
-div[data-baseweb="slider"] [role="slider"] {
-    background: linear-gradient(135deg, #6366f1, #ec4899) !important;
-    border: 2px solid rgba(255,255,255,.2) !important;
-    box-shadow: 0 2px 8px rgba(99,102,241,.4) !important;
-}
-
-/* ── ALERTS ── */
-div[data-baseweb="notification"][kind="positive"],
-.stSuccess {
-    background: rgba(16,185,129,.08) !important;
-    border: 1px solid rgba(16,185,129,.2) !important;
-    border-radius: 10px !important;
-    color: #6ee7b7 !important;
-}
-.stError, div[data-baseweb="notification"][kind="negative"] {
-    background: rgba(239,68,68,.06) !important;
-    border: 1px solid rgba(239,68,68,.2) !important;
-    border-radius: 10px !important;
-}
-.stWarning { background: rgba(245,158,11,.06) !important; border-radius: 10px !important; }
-
-/* ── POST CARDS ── */
 .glass {
-    background: linear-gradient(145deg, rgba(15,22,42,.9) 0%, rgba(10,15,30,.85) 100%);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(99,102,241,.1);
-    border-radius: 16px;
-    padding: 22px;
-    margin-bottom: 16px;
-    transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease;
-    box-shadow: 0 4px 24px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.03) inset;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-}
-.glass::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99,102,241,.3), transparent);
+    background: rgba(13,20,36,.65);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(139,92,246,.1);
+    border-radius: 14px; padding: 20px; margin-bottom: 18px;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    box-shadow: 0 4px 24px rgba(0,0,0,.3);
+    display: flex; flex-direction: column; height: 100%;
 }
 .glass:hover {
-    transform: translateY(-5px) scale(1.005);
-    box-shadow: 0 20px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(99,102,241,.2);
-    border-color: rgba(99,102,241,.25);
+    transform: translateY(-4px);
+    box-shadow: 0 14px 40px rgba(0,0,0,.4);
+    border-color: rgba(139,92,246,.3);
 }
-.card-author {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #F1F5F9;
-    margin-bottom: 2px;
-    letter-spacing: -.02em;
-}
+.card-author { font-size: 1.05rem; font-weight: 700; color: #f1f5f9; margin-bottom: 2px; }
 .card-headline {
-    font-size: .76rem;
-    color: #334155;
-    margin-bottom: 12px;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: .8rem; color: #475569; margin-bottom: 10px; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .card-snippet {
-    font-size: .8rem;
-    color: #7C8FA6;
-    margin-bottom: 14px;
-    line-height: 1.65;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    border-left: 2px solid rgba(99,102,241,.3);
-    padding-left: 12px;
+    font-size: .81rem; color: #94a3b8; margin-bottom: 12px; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    border-left: 2px solid rgba(139,92,246,.35); padding-left: 10px;
     flex-grow: 1;
 }
 .card-date {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(99,102,241,.1);
-    color: #a5b4fc;
-    padding: 4px 12px; border-radius: 999px;
-    font-weight: 600; font-size: .72rem;
-    border: 1px solid rgba(99,102,241,.2);
-    margin-bottom: 12px; width: fit-content;
-    font-family: 'DM Mono', monospace;
+    background: rgba(139,92,246,.1); color: #c4b5fd;
+    padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: .78rem;
+    border: 1px solid rgba(139,92,246,.2); margin-bottom: 12px; width: fit-content;
+    font-family: 'JetBrains Mono', monospace;
 }
 .card-date-empty {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(51,65,85,.2); color: #475569;
-    padding: 4px 12px; border-radius: 999px; font-size: .72rem;
-    border: 1px solid rgba(51,65,85,.3); margin-bottom: 12px; width: fit-content;
-    font-family: 'DM Mono', monospace;
+    background: rgba(100,116,139,.1); color: #64748b;
+    padding: 4px 12px; border-radius: 999px; font-size: .78rem;
+    border: 1px solid rgba(100,116,139,.2); margin-bottom: 12px; width: fit-content;
 }
 .badge-likes {
     display: inline-flex; align-items: center; gap: 5px;
-    background: rgba(236,72,153,.07); color: #f472b6;
-    padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: .8rem;
-    border: 1px solid rgba(236,72,153,.15); margin-bottom: 14px;
-}
-.card-stats {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
-}
-.stat-pill {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(30,41,59,.6); color: #64748b;
-    padding: 3px 10px; border-radius: 6px; font-size: .72rem;
-    border: 1px solid rgba(51,65,85,.4);
-    font-family: 'DM Mono', monospace;
+    background: rgba(251,113,133,.08); color: #fb7185;
+    padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: .85rem;
+    border: 1px solid rgba(251,113,133,.15); margin-bottom: 14px;
 }
 .card-link-linkedin {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-    width: 100%; background: linear-gradient(135deg, #0A66C2, #0369a1);
-    color: #fff !important; padding: 9px 0; border-radius: 10px;
-    text-decoration: none; font-weight: 600; font-size: .82rem;
-    transition: all .25s ease; margin-bottom: 8px;
-    box-shadow: 0 2px 12px rgba(10,102,194,.25);
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; background: linear-gradient(135deg, #0A66C2, #0284c7);
+    color: #fff !important; padding: 9px 0; border-radius: 9px;
+    text-decoration: none; font-weight: 600; font-size: .85rem;
+    transition: filter .2s, transform .15s; margin-bottom: 8px;
 }
-.card-link-linkedin:hover { filter: brightness(1.12); transform: scale(1.02); box-shadow: 0 6px 20px rgba(10,102,194,.4); }
+.card-link-linkedin:hover { filter: brightness(1.15); transform: scale(1.02); }
 .card-link-x {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-    width: 100%; background: rgba(15,23,42,.8);
-    color: #E2E8F0 !important; padding: 9px 0; border-radius: 10px;
-    border: 1px solid rgba(99,102,241,.15);
-    text-decoration: none; font-weight: 600; font-size: .82rem;
-    transition: all .25s ease; margin-bottom: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; background: linear-gradient(135deg, #0f1419, #1a2332);
+    color: #f1f5f9 !important; padding: 9px 0; border-radius: 9px;
+    border: 1px solid rgba(255,255,255,.1);
+    text-decoration: none; font-weight: 600; font-size: .85rem;
+    transition: filter .2s, transform .15s; margin-bottom: 8px;
 }
-.card-link-x:hover { border-color: rgba(99,102,241,.4); background: rgba(99,102,241,.1); transform: scale(1.02); }
+.card-link-x:hover { filter: brightness(1.2); transform: scale(1.02); }
 .card-ts {
-    font-size: .64rem; color: #1E293B; margin-top: auto;
-    padding-top: 10px; border-top: 1px solid rgba(255,255,255,.04);
-    font-family: 'DM Mono', monospace;
+    font-size: .68rem; color: #334155; margin-top: auto;
+    padding-top: 8px; border-top: 1px solid rgba(255,255,255,.04);
+    font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── SECTION HEADER ── */
-.section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.2rem; margin-top: .5rem;
+div.stButton > button {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+    color: #fff !important; font-weight: 700 !important; font-size: 1rem !important;
+    border: none !important; border-radius: 10px !important;
+    padding: .8rem 1.2rem !important;
+    box-shadow: 0 6px 20px rgba(124,58,237,.3);
+    transition: all .25s ease; font-family: 'Sora', sans-serif !important;
+}
+div.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 28px rgba(124,58,237,.45);
+    filter: brightness(1.08);
+}
+div[data-baseweb="input"] > div,
+div[data-baseweb="select"] > div {
+    background: rgba(13,20,36,.8) !important;
+    border: 1px solid rgba(139,92,246,.2) !important;
+    border-radius: 9px !important;
+}
+section[data-testid="stSidebar"] {
+    background: rgba(5,8,15,.95) !important;
+    border-right: 1px solid rgba(139,92,246,.1);
 }
 .section-title {
-    font-size: 1rem; font-weight: 700; color: #E2E8F0;
-    display: flex; align-items: center; gap: 8px; letter-spacing: -.02em;
+    font-size: 1.2rem; font-weight: 700; color: #f1f5f9;
+    margin-bottom: .8rem; display: flex; align-items: center; gap: 8px;
 }
-.section-count {
-    background: rgba(99,102,241,.12); color: #818cf8;
-    padding: 3px 10px; border-radius: 6px; font-size: .75rem;
-    font-weight: 600; font-family: 'DM Mono', monospace;
-    border: 1px solid rgba(99,102,241,.2);
+div.stDownloadButton > button {
+    background: rgba(13,20,36,.8) !important;
+    border: 1px solid rgba(139,92,246,.25) !important;
+    color: #c4b5fd !important; border-radius: 9px !important; font-weight: 600 !important;
+    transition: all .2s ease;
 }
-
-/* ── SUCCESS BANNER ── */
+div.stDownloadButton > button:hover {
+    border-color: #7c3aed !important;
+    background: rgba(124,58,237,.15) !important;
+}
+.stTabs [data-baseweb="tab"] {
+    background-color: transparent !important;
+    font-size: 1.05rem; font-weight: 600; padding: 10px 20px;
+    border-bottom: 2px solid transparent;
+    font-family: 'Sora', sans-serif;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    color: #a78bfa !important; border-bottom-color: #a78bfa !important;
+}
 .success-banner {
-    background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(236,72,153,.06));
-    border: 1px solid rgba(99,102,241,.2);
-    border-radius: 12px; padding: 14px 20px;
-    font-size: .88rem; color: #a5b4fc; margin-bottom: 18px;
-    display: flex; align-items: center; gap: 10px;
+    background: rgba(139,92,246,.08);
+    border: 1px solid rgba(139,92,246,.2);
+    border-radius: 10px; padding: 12px 18px;
+    font-size: .9rem; color: #c4b5fd; margin-bottom: 16px;
 }
-
-/* ── METRIC ROW ── */
-.metric-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.metric-row {
+    display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+}
 .metric-card {
-    background: linear-gradient(145deg, rgba(15,22,42,.8), rgba(10,15,30,.7));
-    border: 1px solid rgba(99,102,241,.1);
-    border-radius: 12px; padding: 14px 18px; flex: 1; min-width: 110px;
-    position: relative; overflow: hidden;
+    background: rgba(13,20,36,.7);
+    border: 1px solid rgba(139,92,246,.12);
+    border-radius: 10px; padding: 14px 20px; flex: 1; min-width: 120px;
 }
-.metric-card::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, #6366f1, #ec4899);
-    opacity: .6;
-}
-.metric-label {
-    font-size: .65rem; color: #475569; text-transform: uppercase;
-    letter-spacing: .1em; margin-bottom: 6px;
-    font-family: 'DM Mono', monospace; font-weight: 500;
-}
-.metric-value { font-size: 1.7rem; font-weight: 800; color: #F1F5F9; letter-spacing: -.04em; }
-
-/* ── DIVIDER ── */
-hr, .stDivider {
-    border-color: rgba(99,102,241,.1) !important;
-    margin: 1.2rem 0 !important;
-}
-
-/* ── TOGGLE ── */
-div[data-baseweb="checkbox"] span {
-    font-size: .85rem !important;
-    color: #94A3B8 !important;
-    font-family: 'Outfit', sans-serif !important;
-}
-
-/* ── EXPANDER ── */
-details summary {
-    background: rgba(15,20,40,.7) !important;
-    border-radius: 10px !important;
-    color: #94A3B8 !important;
-}
-
-/* ── PROGRESS ── */
-div[data-testid="stProgress"] > div > div {
-    background: linear-gradient(90deg, #6366f1, #ec4899) !important;
-    border-radius: 99px !important;
-}
-div[data-testid="stProgress"] > div {
-    background: rgba(30,41,59,.5) !important;
-    border-radius: 99px !important;
-}
-
-/* ── LABEL ── */
-label[data-testid="stWidgetLabel"] p, .stLabel {
-    font-size: .8rem !important;
-    font-weight: 600 !important;
-    color: #64748B !important;
-    letter-spacing: .03em !important;
-    text-transform: none !important;
-    font-family: 'Outfit', sans-serif !important;
-}
+.metric-label { font-size: .72rem; color: #64748b; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+.metric-value { font-size: 1.6rem; font-weight: 700; color: #f1f5f9; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -698,6 +407,7 @@ def _ingest_linkedin(raw_items, keyword, time_period, custom_dates):
             "Reactions": likes,
             "Comments": comments,
             "Reposts": reposts,
+            "Views": 0,
             "Est. Impressions": impressions_est,
             "Tags Polaris": tags_polaris,
             "Platform": "LinkedIn",
@@ -763,6 +473,20 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
         replies = int(item.get("replies") or item.get("reply_count") or 0)
         retweets = int(item.get("retweets") or item.get("retweet_count") or 0)
 
+        # ── Views (X native field) ──
+        raw_views = (
+            item.get("views") or item.get("viewCount") or item.get("view_count")
+            or item.get("impressions") or item.get("impressionCount")
+            # nested inside public_metrics (Twitter v2 API shape)
+            or (item.get("public_metrics") or {}).get("impression_count")
+            or (item.get("public_metrics") or {}).get("view_count")
+            or 0
+        )
+        try:
+            views = int(raw_views)
+        except (ValueError, TypeError):
+            views = 0
+
         url = item.get("url") or item.get("tweetUrl") or ""
         if not url and handle and item.get("id"):
             url = f"https://x.com/{handle.lstrip('@')}/status/{item['id']}"
@@ -801,6 +525,7 @@ def _ingest_x(raw_items, keyword, time_period, custom_dates):
             "Reactions": likes,
             "Comments": replies,
             "Reposts": retweets,
+            "Views": views,
             "Est. Impressions": impressions_est,
             "Tags Polaris": tags_polaris,
             "Platform": "X (Twitter)",
@@ -834,7 +559,7 @@ def _build_excel(posts_linkedin, posts_x, keyword):
     EXPORT_COLS = [
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
-        "Reactions", "Comments", "Reposts", "Est. Impressions",
+        "Reactions", "Comments", "Reposts", "Views", "Est. Impressions",
         "Tags Polaris", "Platform", "Scraped At"
     ]
 
@@ -892,7 +617,7 @@ def _build_excel(posts_linkedin, posts_x, keyword):
             "Profile URL": 40, "Post Link": 40,
             "Post Text (Preview)": 55,
             "Reactions": 12, "Comments": 12, "Reposts": 12,
-            "Est. Impressions": 18, "Tags Polaris": 14,
+            "Views": 14, "Est. Impressions": 18, "Tags Polaris": 14,
             "Platform": 14, "Scraped At": 22
         }
 
@@ -930,7 +655,7 @@ def _build_excel(posts_linkedin, posts_x, keyword):
                     else:
                         cell.fill = ALT_FILL if is_alt else BASE_FILL
                         cell.font = Font(color="94A3B8", size=9, name="Calibri")
-                        if col_name in ("Reactions", "Comments", "Reposts", "Est. Impressions"):
+                        if col_name in ("Reactions", "Comments", "Reposts", "Views", "Est. Impressions"):
                             cell.alignment = Alignment(horizontal="right")
                         else:
                             cell.alignment = Alignment(horizontal="left", wrap_text=False, vertical="center")
@@ -1105,6 +830,7 @@ def _render_results(platform):
 
     cnt_today = sum(1 for p in posts if p.get("PostedDT") and p["PostedDT"] >= midnight_ist)
     total_reactions = sum(p.get("Reactions", 0) for p in posts)
+    total_views = sum(p.get("Views", 0) for p in posts)
     total_impressions = sum(p.get("Est. Impressions", 0) for p in posts)
     polaris_count = sum(1 for p in posts if p.get("Tags Polaris") == "Yes")
 
@@ -1127,19 +853,31 @@ def _render_results(platform):
     )
 
     # Metrics
-    m1, m2, m3, m4, m5 = st.columns(5)
-    m1.metric("📋 Total Posts", len(posts))
-    m2.metric("📅 Today", cnt_today)
-    m3.metric("🎯 Tags Polaris", polaris_count)
-    m4.metric("❤️ Total Reactions", f"{total_reactions:,}")
-    m5.metric("👀 Est. Impressions", f"{total_impressions:,}")
-
-    st.caption("Est. Impressions = Reactions × 80 (LinkedIn) or × 35 (X). Sample only, not full universe.")
+    if platform == "x" and total_views > 0:
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        m1.metric("📋 Total Posts", len(posts))
+        m2.metric("📅 Today", cnt_today)
+        m3.metric("🎯 Tags Polaris", polaris_count)
+        m4.metric("❤️ Reactions", f"{total_reactions:,}")
+        m5.metric("👁️ Real Views", f"{total_views:,}")
+        m6.metric("👀 Est. Impressions", f"{total_impressions:,}")
+        st.caption("Views = actual X view count from API (when available). Est. Impressions = Reactions × 35 (fallback estimate only).")
+    else:
+        m1, m2, m3, m4, m5 = st.columns(5)
+        m1.metric("📋 Total Posts", len(posts))
+        m2.metric("📅 Today", cnt_today)
+        m3.metric("🎯 Tags Polaris", polaris_count)
+        m4.metric("❤️ Total Reactions", f"{total_reactions:,}")
+        m5.metric("👀 Est. Impressions", f"{total_impressions:,}")
+        if platform == "x":
+            st.caption("Views not returned by this scrape. Est. Impressions = Reactions × 35. Enable Debug Mode to inspect raw data fields.")
+        else:
+            st.caption("Est. Impressions = Reactions × 80 (LinkedIn). Sample only, not full universe.")
     st.markdown("")
 
     # Table toggle
     if st.toggle(f"📄 Show raw data table", value=False, key=f"raw_{platform}"):
-        DISPLAY_COLS = ["Date", "Account Name", "Post Link", "Reactions", "Comments", "Reposts", "Est. Impressions", "Tags Polaris"]
+        DISPLAY_COLS = ["Date", "Account Name", "Post Link", "Reactions", "Comments", "Reposts", "Views", "Est. Impressions", "Tags Polaris"]
         df_show = pd.DataFrame(posts)[[c for c in DISPLAY_COLS if c in pd.DataFrame(posts).columns]]
         st.dataframe(
             df_show, use_container_width=True, hide_index=True,
@@ -1226,7 +964,7 @@ def _render_results(platform):
     EXPORT_COLS_DISPLAY = [
         "Date", "Time", "DateTime (IST)", "Account Name", "Headline / Bio",
         "Profile URL", "Post Link", "Post Text (Preview)",
-        "Reactions", "Comments", "Reposts", "Est. Impressions",
+        "Reactions", "Comments", "Reposts", "Views", "Est. Impressions",
         "Tags Polaris", "Platform", "Scraped At"
     ]
     df_export = pd.DataFrame(posts)
@@ -1307,12 +1045,9 @@ if "accumulate_mode" not in st.session_state:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 st.markdown("""
 <div class="hero">
-    <div class="hero-noise"></div>
-    <div class="hero-eyebrow">Polaris School of Technology &nbsp;·&nbsp; Brand Intelligence</div>
-    <div class="hero-rule"></div>
-    <div class="hero-title">Post <span>Tracker</span></div>
-    <div class="hero-sub">Track every LinkedIn &amp; X mention of Polaris in real time · Filter by date · Export branded Excel reports</div>
-    <div class="hero-divider"></div>
+    <div class="hero-eyebrow">Polaris School of Technology · Brand Intelligence</div>
+    <div class="hero-title">🎯 Post Tracker</div>
+    <div class="hero-sub">Track every LinkedIn & X post mentioning Polaris · Filter by date · Download branded Excel</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1321,62 +1056,39 @@ st.markdown("""
 # SIDEBAR
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 with st.sidebar:
-    st.markdown("""
-    <div class="sidebar-logo">
-        <div class="sidebar-logo-dot">🎯</div>
-        <div>
-            <div class="sidebar-logo-text">Post Tracker</div>
-            <div class="sidebar-logo-sub">Polaris Brand Intelligence</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("## ⚙️ Configuration")
+    st.markdown("---")
 
-    st.markdown('<span class="sidebar-label">API Configuration</span>', unsafe_allow_html=True)
     api_token = st.text_input(
-        "Apify API Token",
+        "🔑 Apify API Token",
         value=os.getenv("APIFY_TOKEN", ""),
         type="password",
         placeholder="apify_api_xxxxxxxxxxxx",
         help="Get your token from apify.com → Settings → Integrations",
-        label_visibility="collapsed",
     )
     if api_token:
-        st.success("✅ Token connected")
+        st.success("✅ Token set")
     else:
-        st.warning("Enter your Apify API token")
+        st.warning("⚠️ Enter your Apify API token")
 
     st.markdown("---")
-    st.markdown('<span class="sidebar-label">Run Settings</span>', unsafe_allow_html=True)
-    debug_mode = st.toggle("Debug Mode", value=False)
+    debug_mode = st.toggle("🐛 Debug Mode", value=False)
     accumulate_mode = st.toggle(
-        "Accumulate Runs",
+        "📚 Accumulate Runs",
         value=False,
         help="ON: merges new results with previous scrapes. OFF: fresh slate each run.",
     )
-
     st.markdown("---")
-    st.markdown('<span class="sidebar-label">Estimated Cost</span>', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="cost-chip">
-        <span class="cost-chip-label">LinkedIn</span>
-        <span class="cost-chip-val">$0.005 / post</span>
-    </div>
-    <div class="cost-chip">
-        <span class="cost-chip-label">X / Twitter</span>
-        <span class="cost-chip-val">$0.00015 / tweet</span>
-    </div>
-    """, unsafe_allow_html=True)
-
+    st.markdown("**💰 Cost Reference**")
+    st.caption("LinkedIn: ~$0.005 / post\nX/Twitter: ~$0.00015 / tweet")
     st.markdown("---")
-    st.markdown('<span class="sidebar-label">Deployment</span>', unsafe_allow_html=True)
-    st.caption("Hosted on Streamlit Community Cloud")
-    st.markdown("[Deploy guide ↗](https://share.streamlit.io)")
+    st.markdown("**📌 Hosted on:** Streamlit Community Cloud\n\n[deploy guide ↗](https://share.streamlit.io)")
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # TABS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-tab_li, tab_x, tab_help = st.tabs(["  LinkedIn  ", "  X (Twitter)  ", "  How to Use  "])
+tab_li, tab_x, tab_help = st.tabs(["🔗 LinkedIn", "𝕏 X (Twitter)", "ℹ️ How to Use"])
 
 # ━━ TAB 1: LINKEDIN ━━
 with tab_li:
